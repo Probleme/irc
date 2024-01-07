@@ -1,19 +1,32 @@
-## IRC SERVER PROTOCOL
+# IRC Server Protocol
 
-#this is a simple ic sercer build with c++ languge 
- 
-first lets define server and what is server
+This document provides an overview of a basic IRC server implementation using the C++ programming language.
 
+## Overview
 
-# -------------server-------------
+An IRC (Internet Relay Chat) server acts as a central network hub that facilitates communication between multiple clients. It manages connections, channels, and user commands, ensuring smooth and organized chat functionality.
 
-# componment :
-    # - Client:
-        we will get all client info saved and if some one banned his ip will be saved
-        a client can connect to server and get welcome board 
-        tow client can connect to each other and chat privertly via server this will need to crate somthing like chaneel but it have only the consorned Users
-    # - Channels:
-        for chanelle we will create an ordred map that collect every alive client and if a msg came to chanlle we will broadcast it to all client
-        if user is banned from channel they can't joing it with thier nick and ip
-    # - Commands:
-        all commands to interact with server will try to implement them as object that take user and thier parameters
+## Components
+
+The IRC server consists of several key components, each responsible for a specific aspect of the server's functionality:
+
+### 1. Client
+- **Information Storage**: The server stores essential information about each client, including their IP address. This is crucial for identifying and banning clients if necessary.
+- **Connection and Welcome Message**: Clients are able to connect to the server and are greeted with a welcome message upon connection.
+- **Private Chat**: The server enables two clients to engage in private conversations. This is achieved through the creation of a private 'channel' that is exclusive to the participating users.
+
+### 2. Channel
+- **Implementation**: Channels are implemented as ordered maps, tracking all active clients within each channel.
+- **Broadcasting Messages**: When a message is sent to a channel, it is broadcast to all clients currently in that channel.
+- **Banning Mechanism**: Users banned from a channel are unable to rejoin it using their nickname and IP address.
+
+### 3. Commands
+- **Functionality**: The server processes various commands that clients use to interact with it.
+- **Command Objects**: Commands are implemented as objects that take a user's input and their parameters for execution.
+
+## Conclusion
+
+This IRC server aims to deliver a robust and efficient chat service, focusing on effective client management, seamless channel broadcasting, and responsive command processing. The use of C++ ensures a high-performance backend suitable for handling multiple client connections and real-time communication.
+
+---
+*Note: This README is a brief overview of the IRC server's architecture and functionality. For detailed documentation on code structure, installation, and usage, please refer to the respective sections of the project documentation.*
