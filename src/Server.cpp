@@ -6,7 +6,7 @@
 /*   By: ataouaf <ataouaf@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:26:16 by ataouaf           #+#    #+#             */
-/*   Updated: 2024/01/09 01:27:00 by ataouaf          ###   ########.fr       */
+/*   Updated: 2024/01/09 02:48:58 by ataouaf          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,31 +149,22 @@ void Server::acceptNewConnection()
 void Server::readFromClient(Client *client)
 {
     char buffer[BUFFER_SIZE + 1];
-    int bytes_read = 0;
-    // while ((bytes_read = recv(client->getFd(), buffer, BUFFER_SIZE, 0) > 0))
-    // {
-    //     buffer[bytes_read] = '\0';
-    //     std::string message = buffer;
-    //     if (message.at(message.size() - 1) == '\n')
-    //     {
-    //         // std::vector<std::string> commands = client->split(message, '\n');
-    //         // for (std::vector<std::string>::iterator it = commands.begin(); it != commands.end(); ++it)
-    //         // {
-    //         //     std::cout << "Received: " << *it << std::endl;
-    //         //     // handle the commands
-    //         // }
-    //     }
-    // }
-    // if (bytes_read == 0)
-    // {
-    //     std::cout << "Connection closed" << std::endl;
-    //     // this->removeClient(client->getFd());
-    // }
-    // else if (bytes_read < 0)
-    // {
-    //     std::cerr << "recv failed" << std::endl;
-    //     exit(EXIT_FAILURE);
-    // }
+    int bytes_read = recv(client->getFd(), buffer, BUFFER_SIZE, 0);
+    if (bytes_read < 0)
+    {
+        std::cerr << "recv failed" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    else if (bytes_read == 0)
+    {
+        std::cout << "Connection closed by " << client->getHostname() << std::endl;
+        this->removeClient(client->getFd());
+    }
+    else
+    {
+        buffer[bytes_read] = '\0';
+        std::cout << "Received: " << buffer;
+    }
 }
 
 void Server::removeClient(int fd)
