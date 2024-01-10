@@ -6,7 +6,7 @@
 /*   By: ataouaf <ataouaf@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:26:28 by ataouaf           #+#    #+#             */
-/*   Updated: 2024/01/09 01:02:18 by ataouaf          ###   ########.fr       */
+/*   Updated: 2024/01/09 05:28:38 by ataouaf          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <poll.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sstream>
 # include <sys/types.h>
 # include <sys/time.h>
 
@@ -58,6 +59,7 @@ class Server
         void addNewClient(int fd, std::string ip, int port);
         void readFromClient(Client *client);
         void removeClient(int fd);
+        void handleCommands(Client *client, std::string &command);
         
 };
 

@@ -6,12 +6,16 @@
 /*   By: ataouaf <ataouaf@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:26:16 by ataouaf           #+#    #+#             */
-/*   Updated: 2024/01/09 02:48:58 by ataouaf          ###   ########.fr       */
+/*   Updated: 2024/01/10 11:54:46 by ataouaf          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/Server.hpp"
 #include "../inc/Client.hpp"
+#include "../inc/Command.hpp"
+
+class Client;
+class Command;
 
 Server::Server()
 {
@@ -149,22 +153,43 @@ void Server::acceptNewConnection()
 void Server::readFromClient(Client *client)
 {
     char buffer[BUFFER_SIZE + 1];
-    int bytes_read = recv(client->getFd(), buffer, BUFFER_SIZE, 0);
-    if (bytes_read < 0)
+    do
     {
-        std::cerr << "recv failed" << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    else if (bytes_read == 0)
-    {
-        std::cout << "Connection closed by " << client->getHostname() << std::endl;
-        this->removeClient(client->getFd());
-    }
-    else
-    {
-        buffer[bytes_read] = '\0';
-        std::cout << "Received: " << buffer;
-    }
+        int ret = recv(client->getFd(), buffer, sizeof(buffer), 0);
+        if (ret < 0)
+        {
+            if (errno != EWOULDBLOCK)
+            {
+                std::cerr << "Error: recv() failed for fd " << client->getFd();
+                this->removeClient(client->getFd());
+            }
+            break;
+        }
+        else if (!ret)
+        {
+            std::cout << "Client " << client->getNickname() << " disconnected." << std::endl;
+            this->removeClient(client->getFd());
+            break;
+        }
+        else
+        {
+            buffer[ret] = '\0';
+            std::string buff = buffer;
+            if (buff.at(buff.size() - 1) == '\n')
+            {
+                std::vector<std::string> cmds = client->split(buff, '\n');
+                client->setMessage("");
+                for (std::vector<std::string>::iterator it = cmds.begin(); it != cmds.end(); it++)
+                    this->handleCommands(client, *it);
+            }
+            else
+            {
+                puts(buffer);
+                client->setMessage(client->getMessage() + buff); // append the message to the client's buffer
+            }
+        }
+    } while (1);
+    
 }
 
 void Server::removeClient(int fd)
@@ -176,6 +201,39 @@ void Server::removeClient(int fd)
             delete this->_users[i];
             this->_users.erase(this->_users.begin() + i);
             break;
+        }
+    }
+}
+
+void Server::handleCommands(Client *client, std::string &commands)
+{
+    std::string cmd;
+    std::istringstream message(commands);
+
+    while (std::getline(message, cmd))
+    {
+        cmd = cmd.substr(0, cmd[cmd.length() - 1] == '\r' ? cmd.length() - 1 : cmd.length());
+        std::string name = cmd.substr(0, cmd.find(' '));
+        try
+        {
+            // Command *command = command->_commands.at(name);
+            std::vector<std::string> args;
+            std::string buf;
+            std::istringstream ss(cmd.substr(name.length(), cmd.length()));
+            while (ss >> buf)
+                args.push_back(buf);
+            if (client->isRegistered() )
+            {
+                client->reply("ERROR :You have not registered", client->getNickname());
+                return;
+            }
+            // command->execute(client, args);
+        }
+        catch (const std::out_of_range &e)
+        {
+            // if (name != "CAP")
+            //     client->reply(ERR_UNKNOWNCOMMAND(client->getNickname(), name));
+            client->reply("ERROR :Unknown command", client->getNickname());
         }
     }
 }

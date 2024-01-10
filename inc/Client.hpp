@@ -6,7 +6,7 @@
 /*   By: ataouaf <ataouaf@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/31 16:27:47 by ataouaf           #+#    #+#             */
-/*   Updated: 2024/01/09 01:13:55 by ataouaf          ###   ########.fr       */
+/*   Updated: 2024/01/10 11:37:58 by ataouaf          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class Client{
         std::string _realname;
         std::string _username;
         std::string _nickname;
+        std::string _message;
         int _password;
         int _port;
         int _fd;
@@ -42,6 +43,7 @@ class Client{
     public:
         Client(std::string& host, Server *server, int port, int fd);
         ~Client();
+        void setMessage(std::string message);
         void setNickname(std::string nickname);
         void setUsername(std::string username);
         void setRealname(std::string realname);
@@ -50,6 +52,7 @@ class Client{
         void setPassword(int password);
         void setPort(int port);
         void setFd(int fd);
+        std::string const& getMessage() const;
         std::string const& getNickname() const;
         std::string const& getUsername() const;
         std::string const& getRealname() const;
@@ -59,9 +62,15 @@ class Client{
         int getPort() const;
         int getFd() const;
         
-        // void welcome();
+        bool isRegistered();
+        void welcome();
+        void reply(std::string message);
+        void reply(std::string message, std::string message2);
+        void sendMessage();
         
-        // std::vector<std::string> split(std::string str, char c);
+        std::vector<std::string> split(std::string str, char c);
+
+        
 };
 
 #endif
